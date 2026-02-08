@@ -11,7 +11,7 @@
   body {
     margin: 0;
     height: 100vh;
-    font-family: 'Poppins', Arial, sans-serif;
+    font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #ffe6ee, #fff);
     overflow: hidden;
     display: flex;
@@ -36,65 +36,53 @@
     }
   }
 
-  .container {
+  .card {
     background: white;
-    padding: 28px 22px;
+    padding: 30px 25px 40px;
     border-radius: 22px;
     box-shadow: 0 20px 40px rgba(255, 0, 100, 0.15);
     text-align: center;
     width: 320px;
     position: relative;
-    z-index: 2;
   }
 
-  .teddy {
-    font-size: 75px;
-    animation: float 2.5s ease-in-out infinite;
-  }
-
-  @keyframes float {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-    100% { transform: translateY(0); }
+  .emoji {
+    font-size: 70px;
+    margin-bottom: 10px;
   }
 
   h1 {
     font-size: 18px;
-    margin: 15px 0 20px;
     color: #333;
-  }
-
-  /* Button playground */
-  .playground {
-    position: relative;
-    width: 100%;
-    height: 130px;
-    margin-top: 10px;
-  }
-
-  button {
-    padding: 14px 26px;
-    font-size: 16px;
-    border-radius: 14px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: absolute;
+    margin-bottom: 25px;
   }
 
   #yes {
     background: linear-gradient(135deg, #2ecc71, #1abc9c);
     color: white;
-    box-shadow: 0 6px 18px rgba(0, 200, 100, 0.4);
-    left: 20px;
-    bottom: 10px;
+    border: none;
+    border-radius: 18px;
+    padding: 18px 40px;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0,200,100,0.4);
+    transition: all 0.25s ease;
+    z-index: 2;
   }
 
   #no {
     background: linear-gradient(135deg, #ff7675, #d63031);
     color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 12px 24px;
+    font-size: 16px;
+    position: absolute;
+    bottom: 20px;
     right: 20px;
-    bottom: 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    z-index: 1;
   }
 
   .final {
@@ -102,30 +90,22 @@
     font-size: 20px;
     color: #e84393;
     margin-top: 20px;
-    animation: fadeIn 1s ease forwards;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
   }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <div class="teddy">🧸💖</div>
+<div class="card">
+  <div class="emoji">🧸💖</div>
   <h1 id="question">Surbhi, will you be my Valentine?</h1>
 
-  <div class="playground" id="playground">
-    <button id="yes">Yes</button>
-    <button id="no">No</button>
-  </div>
+  <button id="yes">Yes</button>
+  <button id="no">No</button>
 
-  <div class="final" id="finalMsg">
+  <div class="final" id="final">
     Yayyy 💖 I knew it!<br><br>
-    You just made my heart the happiest 🥰<br>
+    You made my heart the happiest 🥰<br>
     I love you, Surbhi 🌹
   </div>
 </div>
@@ -133,60 +113,66 @@
 <script>
   /* Falling hearts */
   setInterval(() => {
-    const heart = document.createElement("div");
-    heart.className = "heart";
-    heart.innerText = "💖";
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.animationDuration = (3 + Math.random() * 3) + "s";
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 6000);
-  }, 350);
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.innerText = "💖";
+    h.style.left = Math.random() * 100 + "vw";
+    h.style.animationDuration = (3 + Math.random() * 3) + "s";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 6000);
+  }, 400);
 
-  const yesBtn = document.getElementById("yes");
-  const noBtn = document.getElementById("no");
-  const playground = document.getElementById("playground");
-  const finalMsg = document.getElementById("finalMsg");
+  const yes = document.getElementById("yes");
+  const no = document.getElementById("no");
+  const final = document.getElementById("final");
   const question = document.getElementById("question");
 
-  let yesSize = 16;
-  let noTexts = [
+  let noCount = 0;
+  let yesSize = 22;
+
+  const noTexts = [
     "Are you sure?",
     "Think again 😢",
     "Pretty please 🥺",
     "Don’t break my heart 💔",
-    "Okay last chance 😭"
+    "Okay last chance 😭",
+    "You can’t escape 😈"
   ];
-  let noIndex = 0;
 
-  noBtn.addEventListener("click", () => {
-    noBtn.innerText = noTexts[noIndex % noTexts.length];
-    noIndex++;
+  function handleNo() {
+    noCount++;
+
+    // Change NO text
+    no.innerText = noTexts[Math.min(noCount - 1, noTexts.length - 1)];
 
     // Grow YES
     yesSize += 6;
-    yesBtn.style.fontSize = yesSize + "px";
+    yes.style.fontSize = yesSize + "px";
+    yes.style.padding = (18 + noCount * 2) + "px " + (40 + noCount * 4) + "px";
 
-    // Move NO safely inside playground
-    const maxX = playground.clientWidth - noBtn.offsetWidth;
-    const maxY = playground.clientHeight - noBtn.offsetHeight;
+    // Move NO away
+    const x = Math.random() * 160 - 80;
+    const y = Math.random() * 120 - 60;
+    no.style.transform = `translate(${x}px, ${y}px)`;
 
-    let x = Math.random() * maxX;
-    let y = Math.random() * maxY;
-
-    // Avoid YES overlap
-    if (x < 120 && y > 60) {
-      x = maxX - x;
-      y = maxY - y;
+    // After 6 NO attempts
+    if (noCount >= 6) {
+      no.style.display = "none";
+      yes.style.fontSize = "40px";
+      yes.style.padding = "26px 60px";
+      yes.innerText = "YES 💖";
     }
+  }
 
-    noBtn.style.left = x + "px";
-    noBtn.style.top = y + "px";
-  });
+  // Mobile-safe: escape before click
+  no.addEventListener("touchstart", handleNo);
+  no.addEventListener("mouseover", handleNo);
 
-  yesBtn.addEventListener("click", () => {
-    playground.style.display = "none";
+  yes.addEventListener("click", () => {
+    yes.style.display = "none";
+    no.style.display = "none";
     question.style.display = "none";
-    finalMsg.style.display = "block";
+    final.style.display = "block";
   });
 </script>
 
